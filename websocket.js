@@ -196,6 +196,7 @@ Connection.prototype._handshake = function(data){
   try {
     var module = require(module);
     this.module = new module.Module();
+    if (this.module.onConnect) this.module.onConnect(this);
   } catch(e){
     this.log('Handshake aborted. Could not stat module file ' + module + '.js' + ' for resource ' + matches[0]);
     this.socket.close();

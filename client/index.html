@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>Node Shit</title>
+	
+	<script src="js/prototype.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+	    var RemoteBot = {
+	        ws: null,
+	        COMMANDS: {
+	            "37":"left",
+	            "38":"up",
+	            "39":"right",
+	            "40":"down"
+	        }
+	    };
+	    
+	    RemoteBot.ws = new WebSocket("ws://localhost:8080");
+        RemoteBot.ws.onmessage = function(evt) {
+            $("data").value = evt.data;
+        };
+        
+        RemoteBot.init = function() {
+            this.ws = new WebSocket("ws://localhost:8080");
+            this.ws.onmessage = function(evt) {
+                console.log(evt);
+            };
+            
+            this.ws.onopen = function(evt) {
+                this.send($H({ "command":"init-bot" }).toJSON());
+            };
+            
+            Event.observe(window, "keydown", function(evt) {
+                var command = RemoteBot.COMMANDS[evt.keyCode];
+                if(command) {
+                    RemoteBot.ws.send($H({ "command":"move", "arguments":[command] }).toJSON());
+                }
+            });
+        }
+
+        Event.observe(window, "load", RemoteBot.init);
+	</script>
+	
+</head>
+
+<body>
+    <textarea cols="50" rows="10" id="data"></textarea>
+</body>
+</html>
