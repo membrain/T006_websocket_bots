@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="css/app.css" type="text/css" media="screen" title="no title" charset="utf-8">
 
 	<title>Node Shit</title>
 	
@@ -18,17 +19,31 @@
 	            "40":"down"
 	        }
 	    };
+	    var actorElements = [];
 	    
 	    RemoteBot.ws = new WebSocket("ws://localhost:8080");
         RemoteBot.ws.onmessage = function(evt) {
-            $("data").value = evt.data;
+            var parsedData = JSON.parse(evt.data);
+            
+            for (var i = 0; i < actorElements.length; i++) {
+                document.body.removeChild(actorElements[i]);
+            }
+            actorElements = [];
+            
+            for (var actorId in parsedData) {
+                var actor = parsedData[actorId];
+                var e = new Element("div", { "className": "bot" });
+                e.setStyle({ "left": actor._left + "px", "top": actor._top + "px" });
+                actorElements.push(e);
+                document.body.appendChild(e);
+            }
         };
         
         RemoteBot.init = function() {
             this.ws = new WebSocket("ws://localhost:8080");
-            this.ws.onmessage = function(evt) {
-                console.log(evt);
-            };
+            // this.ws.onmessage = function(evt) {
+            //     console.log(evt);
+            // };
             
             this.ws.onopen = function(evt) {
                 this.send($H({ "command":"init-bot" }).toJSON());
@@ -48,6 +63,5 @@
 </head>
 
 <body>
-    <textarea cols="50" rows="10" id="data"></textarea>
 </body>
 </html>

@@ -21,7 +21,7 @@ Module.prototype.onData = function(data, connection) {
 Module.prototype.onConnect = function(connection) {
     this._interval = setInterval(function() {
         connection.send(JSON.stringify(Bot.instances));
-    }, 100);
+    }, 50);
 };
 
 Module.prototype.onDisconnect = function(connection) {
@@ -42,7 +42,7 @@ var Bot = function() {
 };
 
 Bot.NEXT_ID     = 1;
-Bot.STEP        = 10;
+Bot.STEP        = 2;
 Bot.instances   = {};
 
 Bot.prototype.up = function() {
