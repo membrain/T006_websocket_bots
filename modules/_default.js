@@ -19,6 +19,7 @@ Module.prototype.onData = function(data, connection) {
 };
 
 Module.prototype.onConnect = function(connection) {
+    // TODO: This is a bug.
     this._interval = setInterval(function() {
         connection.send(JSON.stringify(Bot.instances));
     }, 50);

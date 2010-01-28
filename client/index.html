@@ -20,30 +20,26 @@
 	        }
 	    };
 	    var actorElements = [];
-	    
-	    RemoteBot.ws = new WebSocket("ws://localhost:8080");
-        RemoteBot.ws.onmessage = function(evt) {
-            var parsedData = JSON.parse(evt.data);
-            
-            for (var i = 0; i < actorElements.length; i++) {
-                document.body.removeChild(actorElements[i]);
-            }
-            actorElements = [];
-            
-            for (var actorId in parsedData) {
-                var actor = parsedData[actorId];
-                var e = new Element("div", { "className": "bot" });
-                e.setStyle({ "left": actor._left + "px", "top": actor._top + "px" });
-                actorElements.push(e);
-                document.body.appendChild(e);
-            }
-        };
-        
+	            
         RemoteBot.init = function() {
             this.ws = new WebSocket("ws://localhost:8080");
-            // this.ws.onmessage = function(evt) {
-            //     console.log(evt);
-            // };
+
+            this.ws.onmessage = function(evt) {
+                var parsedData = JSON.parse(evt.data);
+
+                for (var i = 0; i < actorElements.length; i++) {
+                    document.body.removeChild(actorElements[i]);
+                }
+                actorElements = [];
+
+                for (var actorId in parsedData) {
+                    var actor = parsedData[actorId];
+                    var e = new Element("div", { "className": "bot" });
+                    e.setStyle({ "left": actor._left + "px", "top": actor._top + "px" });
+                    actorElements.push(e);
+                    document.body.appendChild(e);
+                }
+            };
             
             this.ws.onopen = function(evt) {
                 this.send($H({ "command":"init-bot" }).toJSON());
@@ -52,9 +48,9 @@
             Event.observe(window, "keydown", function(evt) {
                 var command = RemoteBot.COMMANDS[evt.keyCode];
                 if(command) {
-                    RemoteBot.ws.send($H({ "command":"move", "arguments":[command] }).toJSON());
+                    this.ws.send($H({ "command":"move", "arguments":[command] }).toJSON());
                 }
-            });
+            }.bind(this));
         }
 
         Event.observe(window, "load", RemoteBot.init);
